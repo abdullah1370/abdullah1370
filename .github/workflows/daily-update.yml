@@ -1,0 +1,38 @@
+name: Daily Dev Snippets (React & Python)
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate Random Dev Snippet
+        run: |
+          mkdir -p daily_dev_snippets
+          DATE=$(date +%Y-%m-%d)
+          TYPE=$(( ( RANDOM % 3 ) + 1 ))
+
+          if [ $TYPE -eq 1 ]; then
+            # React Component
+            echo "import React from 'react'; const Component$DATE = () => { return <div>Daily Update $DATE</div>; }; export default Component$DATE;" > daily_dev_snippets/ReactComp_$DATE.jsx
+          elif [ $TYPE -eq 2 ]; then
+            # React Native Screen
+            echo "import { View, Text } from 'react-native'; export default function Screen$DATE() { return <View><Text>RN Update $DATE</Text></View>; }" > daily_dev_snippets/RNScreen_$DATE.tsx
+          else
+            # Python Logic
+            echo "def logic_$DATE(): return [x for x in range(10) if x % 2 == 0]" > daily_dev_snippets/Logic_$DATE.py
+          fi
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "abdullah1370"
+          git config --global user.email "abdullah@example.com"
+          git add daily_dev_snippets/
+          git commit -m "Update daily snippet: $(date +%Y-%m-%d) [skip ci]"
+          git push
+
